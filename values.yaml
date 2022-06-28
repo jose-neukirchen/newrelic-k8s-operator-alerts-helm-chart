@@ -1,0 +1,68 @@
+apiKey: < >
+accountId: < >
+
+channel:
+  createChannel:
+    enabled: false
+  name: "teste"
+  type: "slack"
+  region: "US"
+  links:
+    policyNames: "teste"
+  configuration:
+    url: < >
+
+policy:
+  createPolicy:
+    enabled: false
+  name: teste
+  incidentPreference: "PER_POLICY"
+  region: "US"
+
+
+alertCondition:
+  createAlertCondition:
+    enabled: true
+  conditions:
+    - name: "teste"
+      type: "NRQL"
+      nrql:
+        query: "SELECT count(*) FROM Transactions"
+        evaluationOffset: 10
+      enabled: true
+      terms:
+        threshold: 75.0
+        threshold_occurrences: "ALL"
+        threshold_duration: 60
+        priority: "CRITICAL"
+        operator: "ABOVE" 
+      expiration:
+        expirationDuration: 360
+        closeViolationsOnExpiration: false
+        openViolationOnExpiration: true
+      violationTimeLimit: "ONE_HOUR"
+      valueFunction: "SINGLE_VALUE"
+      # Must reference an existing New Relic alert policy from your account
+      existingPolicyId: "3328438"
+      region: "US"
+    - name: "teste2"
+      type: "NRQL"
+      nrql:
+        query: "SELECT count(*) FROM Transactions"
+        evaluationOffset: 10
+      enabled: true
+      terms:
+        threshold: 75.0
+        threshold_occurrences: "ALL"
+        threshold_duration: 60
+        priority: "CRITICAL"
+        operator: "ABOVE" 
+      expiration:
+        expirationDuration: 360
+        closeViolationsOnExpiration: false
+        openViolationOnExpiration: true
+      violationTimeLimit: "ONE_HOUR"
+      valueFunction: "SINGLE_VALUE"
+      # Must reference an existing New Relic alert policy from your account
+      existingPolicyId: "3328438"
+      region: "US"
