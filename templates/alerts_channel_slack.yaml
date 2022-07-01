@@ -21,7 +21,7 @@ spec:
       - {{ .Values.channel.links.policyNames }} 
     policy_kubernetes_objects:
       - name: {{ .Values.channel.links.policyNames }}
-        namespace: "default"
+        namespace: {{ .Values.channel.links.namespace }}
   configuration:
     url: {{ .Values.channel.configuration.url }}
 {{- end }}

@@ -9,13 +9,48 @@ metadata:
   name: {{ .Values.policy.name }} 
 spec:
   account_id: {{ .Values.accountId }}
-  api_key: {{ .Values.apiKey }} 
-  # api_key_secret:
-  #   name: nr-api-key
-  #   namespace: default
-  #   key_name: api-key
+  {{- if .Values.alertCondition.secretEnabled }}
+  {{- if .Values.alertCondition.secretEnabled.enabled }}
+  {{- with .apiKeySecret }} 
+  api_key_secret:
+    name: {{ .nrApiKeyName }}
+    namespace: {{ .secretNamespace }}
+    key_name: {{ .apiKey }}
+  {{- end }}
+  {{- else }}
+  api_key: {{ $.Values.apiKey }}
+  {{- end }}
+  {{- end }}
   name: {{ .Values.policy.name }}
   incidentPreference: {{ .Values.policy.incidentPreference }}
   region: {{ .Values.policy.region }}
+  conditions:
+  {{- range .Values.policy.conditions }}
+    - spec:
+        type: {{ .type }}
+        {{- with .nrql }}
+        nrql:
+          query: {{ .query }}
+          evaluationOffset: {{ .evaluationOffset }}
+        {{- end }}
+        enabled: {{ .enabled }}
+        {{- with .terms }}
+        terms:
+          - threshold: {{ .threshold | quote }}
+            threshold_occurrences: {{ .threshold_occurrences }}
+            threshold_duration: {{ .threshold_duration }}
+            priority: {{ .priority }}
+            operator: {{ .operator }}
+        {{- end }}
+        {{- with .expiration }}
+        expiration:
+          expirationDuration: {{ .expirationDuration }}
+          closeViolationsOnExpiration: {{ .closeViolationsOnExpiration }}
+          openViolationOnExpiration: {{ .openViolationOnExpiration }}
+        {{- end }}
+        name: {{ .name }}
+        violationTimeLimit: {{ .violationTimeLimit }}
+        valueFunction: {{ .valueFunction }}
+  {{- end }}
 {{- end }}
 {{- end }}

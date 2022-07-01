@@ -11,11 +11,18 @@ metadata:
   name: {{ .name }}
 spec:
   account_id: {{ $.Values.accountId }}
-  api_key: {{ $.Values.apiKey }} 
-  # api_key_secret:
-  #   name: nr-api-key
-  #   namespace: default
-  #   key_name: api-key
+  {{- if $.Values.alertCondition.secretEnabled }}
+  {{- if $.Values.alertCondition.secretEnabled.enabled }}
+  {{- with .apiKeySecret }} 
+  api_key_secret:
+    name: {{ .nrApiKeyName }}
+    namespace: {{ .secretNamespace }}
+    key_name: {{ .apiKey }}
+  {{- end }}
+  {{- else }}
+  api_key: {{ $.Values.apiKey }}
+  {{- end }}
+  {{- end }}
   type: {{ .type }}
   {{- with .nrql }}
   nrql:
@@ -37,11 +44,13 @@ spec:
     closeViolationsOnExpiration: {{ .closeViolationsOnExpiration }}
     openViolationOnExpiration: {{ .openViolationOnExpiration }}
   {{- end }}
-#  signal:
-#      aggregation_window: 360
-#      evaluation_offset: 30
-#      fill_option: NONE
-#      fill_value: 15
+  {{- with .signal }}
+  signal:
+    aggregation_window: {{ .aggregationWindow }}
+    evaluation_offset: {{ .evaluationOffset }}
+    fill_option: {{ .fillOption }}
+    fill_value: {{ .fillValue }}
+  {{- end }}
   name: {{ .name }}
   violationTimeLimit: {{ .violationTimeLimit }}
   valueFunction: {{ .valueFunction }}
