@@ -1,6 +1,3 @@
-# Note: If using a k8s secret, remove `api_key`, uncomment `api_key_secret`,
-# add your API key to examples/example_secret.yaml, and run
-# `kubectl apply -f examples/example_secret.yaml`
 {{- if .Values.alertCondition.createAlertCondition }}
 {{- if .Values.alertCondition.createAlertCondition.enabled }}
 {{- range .Values.alertCondition.conditions }}
@@ -11,32 +8,21 @@ metadata:
   name: {{ .name }}
 spec:
   account_id: {{ $.Values.accountId }}
-  {{- if $.Values.alertCondition.secretEnabled }}
-  {{- if $.Values.alertCondition.secretEnabled.enabled }}
-  {{- with .apiKeySecret }} 
-  api_key_secret:
-    name: {{ .nrApiKeyName }}
-    namespace: {{ .secretNamespace }}
-    key_name: {{ .apiKey }}
-  {{- end }}
-  {{- else }}
   api_key: {{ $.Values.apiKey }}
-  {{- end }}
-  {{- end }}
-  type: {{ .type }}
+  type: {{ .type | quote }}
   {{- with .nrql }}
   nrql:
-    query: {{ .query }}
+    query: {{ .query | quote }}
     evaluationOffset: {{ .evaluationOffset }}
   {{- end }}
   enabled: {{ .enabled }}
   {{- with .terms }}
   terms:
     - threshold: {{ .threshold | quote }}
-      threshold_occurrences: {{ .threshold_occurrences }}
+      threshold_occurrences: {{ .threshold_occurrences | quote }}
       threshold_duration: {{ .threshold_duration }}
-      priority: {{ .priority }}
-      operator: {{ .operator }}
+      priority: {{ .priority | quote }}
+      operator: {{ .operator | quote }}
   {{- end }}
   {{- with .expiration }}
   expiration:
@@ -44,19 +30,12 @@ spec:
     closeViolationsOnExpiration: {{ .closeViolationsOnExpiration }}
     openViolationOnExpiration: {{ .openViolationOnExpiration }}
   {{- end }}
-  {{- with .signal }}
-  signal:
-    aggregation_window: {{ .aggregationWindow }}
-    evaluation_offset: {{ .evaluationOffset }}
-    fill_option: {{ .fillOption }}
-    fill_value: {{ .fillValue }}
-  {{- end }}
-  name: {{ .name }}
-  violationTimeLimit: {{ .violationTimeLimit }}
-  valueFunction: {{ .valueFunction }}
+  name: {{ .name | quote }}
+  violationTimeLimit: {{ .violationTimeLimit | quote }}
+  valueFunction: {{ .valueFunction | quote }}
   # Must reference an existing New Relic alert policy from your account
-  existing_policy_id: {{ .existingPolicyId | quote}}
-  region: {{ .region }}
+  existing_policy_id: {{ .existingPolicyId | int | quote }}
+  region: {{ .region | quote }}
 {{- end }}
 {{- end }}
 {{- end }}

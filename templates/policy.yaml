@@ -1,6 +1,3 @@
-# Note: If using a k8s secret, remove `api_key`, uncomment `api_key_secret`,
-# add your API key to examples/example_secret.yaml, and run
-# `kubectl apply -f examples/example_secret.yaml`
 {{- if .Values.policy.createPolicy }}
 {{- if .Values.policy.createPolicy.enabled }}
 apiVersion: nr.k8s.newrelic.com/v1
@@ -9,48 +6,38 @@ metadata:
   name: {{ .Values.policy.name }} 
 spec:
   account_id: {{ .Values.accountId }}
-  {{- if .Values.alertCondition.secretEnabled }}
-  {{- if .Values.alertCondition.secretEnabled.enabled }}
-  {{- with .apiKeySecret }} 
-  api_key_secret:
-    name: {{ .nrApiKeyName }}
-    namespace: {{ .secretNamespace }}
-    key_name: {{ .apiKey }}
-  {{- end }}
-  {{- else }}
   api_key: {{ $.Values.apiKey }}
-  {{- end }}
-  {{- end }}
   name: {{ .Values.policy.name }}
-  incidentPreference: {{ .Values.policy.incidentPreference }}
-  region: {{ .Values.policy.region }}
+  incidentPreference: {{ .Values.policy.incidentPreference | quote }}
+  region: {{ .Values.policy.region | quote }}
   conditions:
   {{- range .Values.policy.conditions }}
     - spec:
-        type: {{ .type }}
+        type: {{ .type | quote }}
         {{- with .nrql }}
         nrql:
-          query: {{ .query }}
+          query: {{ .query | quote }}
           evaluationOffset: {{ .evaluationOffset }}
         {{- end }}
         enabled: {{ .enabled }}
         {{- with .terms }}
         terms:
           - threshold: {{ .threshold | quote }}
-            threshold_occurrences: {{ .threshold_occurrences }}
+            threshold_occurrences: {{ .threshold_occurrences | quote }}
             threshold_duration: {{ .threshold_duration }}
-            priority: {{ .priority }}
-            operator: {{ .operator }}
+            priority: {{ .priority | quote }}
+            operator: {{ .operator | quote }}
         {{- end }}
-        {{- with .expiration }}
-        expiration:
-          expirationDuration: {{ .expirationDuration }}
-          closeViolationsOnExpiration: {{ .closeViolationsOnExpiration }}
-          openViolationOnExpiration: {{ .openViolationOnExpiration }}
-        {{- end }}
-        name: {{ .name }}
-        violationTimeLimit: {{ .violationTimeLimit }}
-        valueFunction: {{ .valueFunction }}
+        # Expiration section needs more tests 
+        # {{- with .expiration }}
+        # expiration:
+        #   expirationDuration: {{ .expirationDuration }}
+        #   closeViolationsOnExpiration: {{ .closeViolationsOnExpiration }}
+        #   openViolationOnExpiration: {{ .openViolationOnExpiration }}
+        # {{- end }}
+        name: {{ .name | quote }}
+        violationTimeLimit: {{ .violationTimeLimit | quote }}
+        valueFunction: {{ .valueFunction | quote }}
   {{- end }}
 {{- end }}
 {{- end }}

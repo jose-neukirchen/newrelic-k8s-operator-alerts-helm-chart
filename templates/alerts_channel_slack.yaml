@@ -3,27 +3,23 @@
 apiVersion: nr.k8s.newrelic.com/v1
 kind: AlertsChannel
 metadata:
+  annotations:
+    helm.sh/hook: post-install
   name: {{ .Values.channel.name }} 
 spec:
-  api_key: {{ .Values.apiKey }} 
-  # api_key_secret:
-  #   name: nr-api-key
-  #   namespace: default
-  #   key_name: api-key
-  name: {{ .Values.channel.name }} 
-  region: {{ .Values.channel.region }}
-  type: {{ .Values.channel.type }} 
+  api_key: {{ $.Values.apiKey }}
+  name: {{ .Values.channel.name | quote }} 
+  region: {{ .Values.channel.region | quote }}
+  type: {{ .Values.channel.type | quote }}
   links:
-    # Policy links can be by NR PolicyID, NR PolicyName OR K8s AlertPolicy object reference
-    policy_ids:
-      - 1
-    policy_names:
-      - {{ .Values.channel.links.policyNames }} 
-    policy_kubernetes_objects:
-      - name: {{ .Values.channel.links.policyNames }}
-        namespace: {{ .Values.channel.links.namespace }}
+  {{- with .Values.channel.links }}
+    policy_names: 
+    {{- range .policyNames }}
+      - {{ . | quote }}
+    {{- end }}
+  {{- end }}
   configuration:
-    url: {{ .Values.channel.configuration.url }}
+    url: {{ .Values.channel.configuration.url | quote }}
 {{- end }}
 {{- end }}
     

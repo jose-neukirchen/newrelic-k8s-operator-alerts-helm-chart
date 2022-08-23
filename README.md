@@ -2,6 +2,6 @@
 A helm chart for the newrelic k8s operator
 
 Creates:
- - Alerts Policy
- - NRQL Alerts condition
- - Alerts Channel
+ - Alerts Policies
+ - NRQL Alerts conditions
+ - Alerts Channels

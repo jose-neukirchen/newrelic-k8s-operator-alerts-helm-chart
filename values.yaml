@@ -3,162 +3,69 @@ accountId: ""
 
 channel:
   createChannel:
-    # Set to true to enable the channel creation.
-    enabled: false
-  name: "teste"
-  type: "slack"
-  region: "US"
+  # Set to true to enable the channel creation.
+    enabled: true
+  name: channel
+  type: slack
+  region: US
   links:
-    policyNames: "teste"
-    namespace: "default"
+    policyNames: 
+      # - policy1
+      # - policy2
+      # - policy3
   configuration:
-    # Webhook of the slack channel
+  # Webhook of the slack channel
     url: ""
 
 policy:
   createPolicy:
-    # Set to true to enable the policy creation.
-    enabled: false
-  name: teste
-  incidentPreference: "PER_POLICY"
-  region: "US"
+  # Set to true to enable the policy creation.
+    enabled: true
+  name: policy
+  incidentPreference: PER_POLICY
+  region: US
+  conditions:
   # Create one or more alert conditions at policy creation.
-  # conditions:
-  #   - name: "teste"
-  #     type: "NRQL"
-  #     nrql:
-  #       query: "SELECT count(*) FROM Transactions"
-  #       evaluationOffset: 10
-  #     enabled: true
-  #     terms:
-  #       threshold: 75.0
-  #       threshold_occurrences: "ALL"
-  #       threshold_duration: 60
-  #       priority: "CRITICAL"
-  #       operator: "ABOVE" 
-  #     expiration:
-  #       expirationDuration: 360
-  #       closeViolationsOnExpiration: false
-  #       openViolationOnExpiration: true
-  #     violationTimeLimit: "ONE_HOUR"
-  #     valueFunction: "SINGLE_VALUE"
-  #   - name: "teste2"
-  #     type: "NRQL"
-  #     nrql:
-  #       query: "SELECT count(*) FROM Transactions"
-  #       evaluationOffset: 10
-  #     enabled: true
-  #     terms:
-  #       threshold: 75.0
-  #       threshold_occurrences: "ALL"
-  #       threshold_duration: 60
-  #       priority: "CRITICAL"
-  #       operator: "ABOVE" 
-  #     expiration:
-  #       expirationDuration: 360
-  #       closeViolationsOnExpiration: false
-  #       openViolationOnExpiration: true
-  #     violationTimeLimit: "ONE_HOUR"
-  #     valueFunction: "SINGLE_VALUE"
+    - name: testcond
+      type: NRQL
+      nrql:
+        query: SELECT count(*) FROM Transactions
+        evaluationOffset: 10
+      enabled: true
+      terms:
+        threshold: 75.0
+        threshold_occurrences: ALL
+        threshold_duration: 60
+        priority: CRITICAL
+        operator: ABOVE
+      violationTimeLimit: ONE_HOUR
+      valueFunction: SINGLE_VALUE
 
-# Use alertCondition to create alerts in existing policies. To create alerts in a new policy use the conditions 
-# section at "policy".
+# The alertCondition is used to create alerts in existing policies. To create alerts in a new policy, 
+# managed by the operator, use the conditions section at "policy".
 alertCondition:
   createAlertCondition:
-    # Set to true to enable the creation of alerts in existing policies.
-    enabled: false
-  secretEnabled:
-    # Set to true if you're using k8s secrets to store your apiKey.
-    enabled: false
+  # Set to true to enable the creation of alerts in existing policies.
+    enabled: true
   conditions:
-    - name: "cpu"
-      # Uncomment if using k8s secrets to store apiKey.
-      # apiKeySecret:
-      #   nrApiKeyName: "..."
-      #   secretNamespace: "..."
-      #   apiKey: "..."
-      type: "NRQL"
-      nrql:
-        query: "FROM K8sContainerSample SELECT (latest(cpuUsedCores / cpuLimitCores) * 100) AS 'CPU%'  WHERE clusterName = 'cluster' and containerName LIKE '%name%' FACET clusterName, podName"
-        evaluationOffset: 10
-      enabled: true
-      terms:
-        threshold: 75.0
-        threshold_occurrences: "ALL"
-        threshold_duration: 60
-        priority: "CRITICAL"
-        operator: "ABOVE" 
-      expiration:
-        expirationDuration: 360
-        closeViolationsOnExpiration: false
-        openViolationOnExpiration: true
-      signal:
-        aggregationWindow: 360
-        evaluationOffset: 30
-        fillOption: NONE
-        fillValue: 15
-      violationTimeLimit: "ONE_HOUR"
-      valueFunction: "SINGLE_VALUE"
-      # Must reference an existing New Relic alert policy from your account
-      existingPolicyId: " "
-      region: "US"
-    - name: "mem"
-      apiKeySecret:
-        nrApiKeyName: "..."
-        secretNamespace: "..."
-        apiKey: "..."
-      type: "NRQL"
-      nrql:
-        query: "SELECT (average(memoryUsedBytes / memoryLimitBytes) * 100) AS 'Memory%' FROM K8sContainerSample WHERE clusterName = 'clustername' and containerName LIKE '%deployment-name%' FACET clusterName, podName "
-        evaluationOffset: 10
-      enabled: true
-      terms:
-        threshold: 75.0
-        threshold_occurrences: "ALL"
-        threshold_duration: 60
-        priority: "CRITICAL"
-        operator: "ABOVE" 
-      expiration:
-        expirationDuration: 360
-        closeViolationsOnExpiration: false
-        openViolationOnExpiration: true
-      signal:
-        aggregationWindow: 360
-        evaluationOffset: 30
-        fillOption: NONE
-        fillValue: 15
-      violationTimeLimit: "ONE_HOUR"
-      valueFunction: "SINGLE_VALUE"
-      # Must reference an existing New Relic alert policy from your account
-      existingPolicyId: ""
-      region: "US"
-    - name: "restart"
-      apiKeySecret:
-        nrApiKeyName: "..."
-        secretNamespace: "..."
-        apiKey: "..."
-      type: "NRQL"
-      nrql:
-        query: "FROM K8sContainerSample SELECT max(restartCount) - min(restartCount) AS 'Restarts' WHERE clusterName = 'clusterName' AND containerName LIKE '%name%' FACET clusterName, podName"
-        evaluationOffset: 10
-      enabled: true
-      terms:
-        threshold: 75.0
-        threshold_occurrences: "ALL"
-        threshold_duration: 60
-        priority: "CRITICAL"
-        operator: "ABOVE" 
-      expiration:
-        expirationDuration: 360
-        closeViolationsOnExpiration: false
-        openViolationOnExpiration: true
-      signal:
-        aggregationWindow: 360
-        evaluationOffset: 30
-        fillOption: NONE
-        fillValue: 15
-      violationTimeLimit: "ONE_HOUR"
-      valueFunction: "SINGLE_VALUE"
-      # Must reference an existing New Relic alert policy from your account
-      existingPolicyId: ""
-      region: "US"
+    # - name: testCondition
+    #   type: NRQL
+    #   nrql:
+    #     query: SELECT count(*) FROM Transactions
+    #     evaluationOffset: 10
+    #   enabled: true
+    #   terms:
+    #     threshold: 75.0
+    #     threshold_occurrences: ALL
+    #     threshold_duration: 60
+    #     priority: CRITICAL
+    #     operator: ABOVE
+    #   expiration:
+    #     expirationDuration: 360
+    #     closeViolationsOnExpiration: false
+    #     openViolationOnExpiration: true
+    #   violationTimeLimit: ONE_HOUR
+    #   valueFunction: SINGLE_VALUE
+    #   # Must reference an existing New Relic alert policy from your account
+    #   existingPolicyId: 33333333
+    #   region: US
